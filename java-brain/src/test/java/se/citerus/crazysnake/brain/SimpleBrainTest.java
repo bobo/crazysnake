@@ -11,6 +11,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import se.citerus.crazysnake.Direction;
 import static org.junit.Assert.*;
 import se.citerus.crazysnake.GameState;
 import se.citerus.crazysnake.Movement;
@@ -21,7 +22,11 @@ import se.citerus.crazysnake.Position;
  * @author bobo
  */
 public class SimpleBrainTest {
-    
+    private final Position base = position(15,15);
+    private final Position left = position(14,15);
+    private final Position right = position(16,15);
+    private final Position up = position(15,14);
+    final Position down = position(15,16);
     public SimpleBrainTest() {
     }
 
@@ -64,8 +69,7 @@ public class SimpleBrainTest {
     
     @Test
     public void testGetMin() {
-        List<Position> candidates = Arrays.asList(position(10,10),
-                position(15,15),
+        List<Position> candidates = Arrays.asList(position(10,10), base,
                 position(10,0),
                 position(0,10),
                 position(10,10));
@@ -73,10 +77,74 @@ public class SimpleBrainTest {
         Position result = instance.getPositionWithMinDistanceFrom(position(0,0), candidates);
         assertEquals(result,position(10,0));
         result = instance.getPositionWithMinDistanceFrom(position(14,13), candidates);
-        assertEquals(position(15,15),result);
+        assertEquals(base,result);
     }
+    
+    @Test
+    public void testGetSortedFruits() {
+        List<Position> candidates = Arrays.asList(position(10,10), base,
+                position(10,0),
+                position(0,10),
+                position(10,10));
+        PlaceKitten instance = new PlaceKitten();
+        List<Position> result = instance.getSortedFruits(position(0,0), candidates);
+        assertEquals(result.get(0), position(10,0));
+        assertEquals(result.get(1), position(0,10));
+        assertEquals(result.get(2), position(10,10));
+        assertEquals(result.get(3), position(10,10));
+        assertEquals(result.get(4), base);
+    }
+    
+    @Test
+    public void testSimplePosition() {
+        PlaceKitten instance = new PlaceKitten();
+        Movement expectedMove = instance.convertPositionsToDirections(Direction.WEST, base, up);        
+        assertEquals(Movement.RIGHT, expectedMove);
+        expectedMove = instance.convertPositionsToDirections(Direction.WEST, base, position(15,16));
+        assertEquals(Movement.LEFT, expectedMove);
+        expectedMove = instance.convertPositionsToDirections(Direction.WEST, base, position(14,15));
+        assertEquals(Movement.FORWARD, expectedMove);
+    }
+    
+    
+    
+    @Test
+    public void testGetUpdatedPosition() {
+        PlaceKitten instance = new PlaceKitten();
+        
+        Position updatedPosition = instance.getUpdatedPosition(base,Direction.EAST, Movement.FORWARD);
+        assertEquals(right,updatedPosition);
+         updatedPosition = instance.getUpdatedPosition(base,Direction.EAST, Movement.LEFT);
+        assertEquals(up,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.EAST, Movement.RIGHT);        
+        assertEquals(down,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.NORTH, Movement.FORWARD);
+        assertEquals("up",up,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.NORTH, Movement.LEFT);
+        assertEquals(left,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.NORTH, Movement.RIGHT);
+        assertEquals(right,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.WEST, Movement.FORWARD);
+        assertEquals(left,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.WEST, Movement.LEFT);
+        assertEquals(down,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.WEST, Movement.RIGHT);
+        assertEquals(up,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.SOUTH, Movement.FORWARD);
+        assertEquals(down,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.SOUTH, Movement.LEFT);
+        assertEquals(right,updatedPosition);
+        updatedPosition = instance.getUpdatedPosition(base,Direction.SOUTH, Movement.RIGHT);
+        assertEquals(left,updatedPosition);
+        
+    }
+    
+    
     
     private Position position(int x, int y) {
         return new Position(x, y);
     }
+    
+    
+    
 }
