@@ -48,7 +48,7 @@ public class SimpleBrainTest {
     public void testGetDistance() {
         System.out.println("getNextMove");
 
-        SimpleBrain instance = new SimpleBrain();
+        PlaceKitten instance = new PlaceKitten();
         Position p1 = new Position(0, 0);
         int calculateDistance = instance.calculateDistance(p1, position(0,0));
         assertEquals(calculateDistance, 0);
@@ -69,7 +69,7 @@ public class SimpleBrainTest {
                 position(10,0),
                 position(0,10),
                 position(10,10));
-        SimpleBrain instance = new SimpleBrain();
+        PlaceKitten instance = new PlaceKitten();
         Position result = instance.getPositionWithMinDistanceFrom(position(0,0), candidates);
         assertEquals(result,position(10,0));
         result = instance.getPositionWithMinDistanceFrom(position(14,13), candidates);
