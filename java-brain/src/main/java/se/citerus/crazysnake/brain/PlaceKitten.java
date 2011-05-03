@@ -157,9 +157,10 @@ public class PlaceKitten extends BaseBrain {
             @Override
             public int compare(Position t, Position t1) {
                 int tvalue = 0, t1value = 0;
-                if (isInMyDirection(base, d, t)) tvalue = 5;
-                if (isInMyDirection(base, d, t1)) t1value = 5;
-                return calculateDistance(base, t)+tvalue > calculateDistance(base, t1)+t1value ? 1 : -1;
+                if (isInMyDirection(base, d, t)) tvalue = 2;
+                if (isInMyDirection(base, d, t1)) t1value = 2;
+                System.out.println(t+":"+tvalue+"distance: "+calculateDistance(base, t)+" _ "+t1+":"+t1value+" distance: "+calculateDistance(base, t1));
+                return (calculateDistance(base, t)-tvalue) > (calculateDistance(base, t1)-t1value) ? 1 : -1;
             }
         });
         return fruits;
