@@ -49,7 +49,7 @@ public class SimpleBrainTest {
     /**
      * Test of getNextMove method, of class SimpleBrain.
      */
-    @Test
+    @Test 
     public void testGetDistance() {
         System.out.println("getNextMove");
 
@@ -80,20 +80,40 @@ public class SimpleBrainTest {
         assertEquals(base,result);
     }
     
+//    @Test
+//    public void testGetOptimalFruits() {
+//        List<Position> candidates = Arrays.asList(position(10, 15), position(15, 10) );
+//        PlaceKitten instance = new PlaceKitten();
+//        Position pos = instance.getOptimalFruit(base, Direction.NORTH, candidates);
+//        assertEquals(pos, position(15,10));
+//        
+//    }
+    
     @Test
-    public void testGetSortedFruits() {
-        List<Position> candidates = Arrays.asList(position(10,10), base,
-                position(10,0),
-                position(0,10),
-                position(10,10));
+    public void testIsInMyDirection() {
         PlaceKitten instance = new PlaceKitten();
-        List<Position> result = instance.getSortedFruits(position(0,0), candidates);
-        assertEquals(result.get(0), position(10,0));
-        assertEquals(result.get(1), position(0,10));
-        assertEquals(result.get(2), position(10,10));
-        assertEquals(result.get(3), position(10,10));
-        assertEquals(result.get(4), base);
+        assertTrue(instance.isInMyDirection(base, Direction.NORTH, position(15, 10)));
+        assertFalse(instance.isInMyDirection(base, Direction.WEST, position(15, 10)));
+        assertTrue(instance.isInMyDirection(base, Direction.WEST, position(10, 15)));
+        assertFalse(instance.isInMyDirection(base, Direction.NORTH, position(10, 15)));
     }
+    
+    
+    
+//    @Test
+//    public void testGetSortedFruits() {
+//        List<Position> candidates = Arrays.asList(position(10,10), base,
+//                position(10,0),
+//                position(0,10),
+//                position(10,10));
+//        PlaceKitten instance = new PlaceKitten();
+//        List<Position> result = instance.getSortedFruits(position(0,0), candidates);
+//        assertEquals(result.get(0), position(10,0));
+//        assertEquals(result.get(1), position(0,10));
+//        assertEquals(result.get(2), position(10,10));
+//        assertEquals(result.get(3), position(10,10));
+//        assertEquals(result.get(4), base);
+//    }
     
     @Test
     public void testSimplePosition() {

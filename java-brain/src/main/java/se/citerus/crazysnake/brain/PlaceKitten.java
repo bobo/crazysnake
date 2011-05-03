@@ -32,21 +32,55 @@ public class PlaceKitten extends BaseBrain {
             Movement candidate = convertPositionsToDirections(myself.getDirection(), myself.getHeadPosition(), closesFruit);
             if (!isCollision(candidate, state, myself)) {
                 return candidate;
-            } else {
-                if (!isCollision(Movement.LEFT, state, myself)) {
-                    return Movement.LEFT;
-                }
-                else if (!isCollision(Movement.RIGHT, state, myself)) {
-                    return Movement.RIGHT;
-                }
-                else {
-                    return Movement.FORWARD;
-                }
             }
-        } else {
-            return Movement.FORWARD;
         }
+
+        return pickOptimalMovement(state, myself);
+
     }
+    Movement pickOptimalMovement(GameState state, Snake myself) {
+        int max=0;
+        Movement result=Movement.FORWARD;
+        for (Movement movement : Movement.values()) {
+            int current = getNumberOfFreePositions(state, myself, movement);
+            if(current>max)  {
+                max=current;
+                result=movement;
+            }
+        }
+        return result;
+
+    }
+    
+    
+    int getNumberOfFreePositions(GameState state, Snake myself, Movement m) {
+        
+        Position current = getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m);
+        int count=0;
+        while(state.getSquare(current).isUnoccupied() && count<=10) {
+          current = getUpdatedPosition(current, myself.getDirection(), Movement.FORWARD);
+          count++;
+        }
+        return count;
+    }
+    
+    boolean hasClearPath(Position snake, Position fruit, GameState state) {
+        List<Position> positionsBetweenPoints = getPositionsBetweenPoints(snake, fruit);
+        for (Position position : positionsBetweenPoints) {
+            if(!state.getSquare(position).isUnoccupied())
+                return false;
+        }
+        return true;
+    }
+    
+   List<Position> getPositionsBetweenPoints(Position snake, Position fruit) {
+       Position current = snake;
+//       Movement move = convertPositionsToDirections(Direction.EAST, snake, fruit);
+//      getUpdatedPosition(current, Direction.EAST, Movement.LEFT)
+       return Collections.EMPTY_LIST;
+   }
+    
+    
 
     Position getUpdatedPosition(Position p, Direction d, Movement step) {
         if (d.equals(Direction.EAST) && step.equals(Movement.FORWARD)) {
@@ -89,8 +123,9 @@ public class PlaceKitten extends BaseBrain {
     }
 
     boolean isCollision(Movement m, GameState state, Snake myself) {
-System.out.println(m+":"+myself.getHeadPosition()+":"+getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m)+"::"+state.getSquare(getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m)).isLethalCollision());
-        return state.getSquare(getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m)).isLethalCollision();
+
+        System.out.println(m + ":" + myself.getHeadPosition() + ":" + getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m) + "::" + state.getSquare(getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m)).isUnoccupied());
+        return !state.getSquare(getUpdatedPosition(myself.getHeadPosition(), myself.getDirection(), m)).isUnoccupied();
 
     }
 
@@ -116,18 +151,41 @@ System.out.println(m+":"+myself.getHeadPosition()+":"+getUpdatedPosition(myself.
         return Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY() - p2.getY());
     }
 
-    List<Position> getSortedFruits(final Position base, List<Position> fruits) {
+    List<Position> getSortedFruits(final Position base, final Direction d, List<Position> fruits) {
         Collections.sort(fruits, new Comparator<Position>() {
 
             @Override
             public int compare(Position t, Position t1) {
-                return calculateDistance(base, t) > calculateDistance(base, t1) ? 1 : -1;
+                int tvalue = 0, t1value = 0;
+                if (isInMyDirection(base, d, t)) tvalue = 5;
+                if (isInMyDirection(base, d, t1)) t1value = 5;
+                return calculateDistance(base, t)+tvalue > calculateDistance(base, t1)+t1value ? 1 : -1;
             }
         });
         return fruits;
 
     }
 
+    Position getOptimalFruit(Position base, Direction d, List<Position> fruits) {
+        try {
+            return getSortedFruits(base, d, fruits).get(0);
+        } catch (Exception e) {
+            return null;
+        }   
+
+    }
+    
+    boolean isInMyDirection(Position my, Direction d, Position fruit) {
+        Position diff = new Position(fruit.getX() - my.getX(), fruit.getY() - my.getY());
+        if ((diff.getX() > 0 && d.equals(Direction.EAST)) ||
+            (diff.getY() > 0 && d.equals(Direction.SOUTH)) ||
+            (diff.getX() < 0 && d.equals(Direction.WEST)) ||
+            (diff.getY() < 0 && d.equals(Direction.NORTH))) {
+            return true;
+        }
+        return false;
+    }
+    
     Position getClosesFruit(Position base, List<Position> fruits) {
         return getPositionWithMinDistanceFrom(base, fruits);
     }
@@ -153,9 +211,4 @@ System.out.println(m+":"+myself.getHeadPosition()+":"+getUpdatedPosition(myself.
         return positions;
     }
 
-    boolean hasClearPath(Position base, Position goal, GameState state) {
-
-
-        return false;
-    }
 }
